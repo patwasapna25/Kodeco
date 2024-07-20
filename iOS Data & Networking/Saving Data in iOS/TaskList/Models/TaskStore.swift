@@ -31,6 +31,7 @@ import Foundation
 
 class TaskStore: ObservableObject {  
     let tasksJSONUrl = URL(fileURLWithPath: "PrioritizedTasks", relativeTo: FileManager.documentsDirectoryURL).appendingPathExtension("json")
+    let taskPlistUrl = URL(fileURLWithPath: "PrioritizedTasks", relativeTo: FileManager.documentsDirectoryURL).appendingPathExtension("plist")
     @Published var prioritizedTasks: [PrioritizedTasks] = [
         PrioritizedTasks(priority: .high, tasks: []),
         PrioritizedTasks(priority: .medium, tasks: []),
@@ -38,12 +39,14 @@ class TaskStore: ObservableObject {
         PrioritizedTasks(priority: .no, tasks: [])
     ] {
         didSet {
-            saveJSONPrioritizedTasks()
+//            saveJSONPrioritizedTasks()
+            savePlistPrioritizedTasks()
         }
     }
     
     init() {
-        loadPrioritizedTasksJSON()
+//        loadPrioritizedTasksJSON()
+        loadPrioritizedTasksPList()
     }
     
     func getIndex(for priority: Task.Priority) -> Int {
@@ -73,6 +76,35 @@ class TaskStore: ObservableObject {
         do {
             let tasksData = try encoder.encode(prioritizedTasks)
             try tasksData.write(to: tasksJSONUrl, options: .atomicWrite)
+        } catch let error {
+            print(error)
+        }
+    }
+    
+    // save data using plist
+    private func savePlistPrioritizedTasks() {
+        guard FileManager.default.fileExists(atPath: taskPlistUrl.path) else {
+            return
+        }
+        let encoder = PropertyListEncoder()
+        encoder.outputFormat = .xml
+        
+        do {
+            let tasksData = try encoder.encode(prioritizedTasks)
+            try tasksData.write(to: taskPlistUrl, options: .atomicWrite)
+        } catch let error {
+            print(error)
+        }
+    }
+    
+    private func loadPrioritizedTasksPList() { 
+        guard FileManager.default.fileExists(atPath: taskPlistUrl.path) else {
+            return // load data only if file exists
+        }
+        let decoder = PropertyListDecoder()
+        do {            
+            let prioritizedTasksData = try Data(contentsOf: taskPlistUrl)
+            prioritizedTasks = try decoder.decode([PrioritizedTasks].self, from: prioritizedTasksData)
         } catch let error {
             print(error)
         }
