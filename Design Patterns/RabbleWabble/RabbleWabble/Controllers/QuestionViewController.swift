@@ -28,10 +28,21 @@
 
 import UIKit
 
+public protocol QuestionViewControllerDelegate: AnyObject {
+  func questionViewController(_ viewController: QuestionViewController, didCancel questionGroup: QuestionGroup, at questionIndex: Int)
+  func questionViewController(_ viewController: QuestionViewController, didComplete questionGroup: QuestionGroup)
+}
+
 public class QuestionViewController: UIViewController {
 
   // MARK: - Instance Properties
-  public var questionGroup = QuestionGroup.basicPhrases()
+  public weak var delegate: QuestionViewControllerDelegate?
+
+  public var questionGroup = QuestionGroup.basicPhrases() {
+    didSet {
+      navigationItem.title = questionGroup.title
+    }
+  }
   public var questionIndex = 0
   
   public var correctCount = 0
@@ -42,10 +53,25 @@ public class QuestionViewController: UIViewController {
     return (view as! QuestionView)
   }
   
+  private lazy var questionIndexItem: UIBarButtonItem = { [weak self] in
+    let item = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+    self?.navigationItem.rightBarButtonItem = item 
+    return item
+  }()
+
   // MARK: - View Lifecycle
   public override func viewDidLoad() {
     super.viewDidLoad()
     showQuestion()
+    setUpCancelButton()
+  }
+  
+  private func setUpCancelButton() {
+    navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "ic_menu"), style: .plain, target: self, action: #selector(handleCanclePressed(sender:)))
+  }
+  
+  @objc private func handleCanclePressed(sender: UIBarButtonItem) {
+    delegate?.questionViewController(self, didCancel: questionGroup, at: questionIndex)
   }
   
   private func showQuestion() {
@@ -57,6 +83,7 @@ public class QuestionViewController: UIViewController {
     
     questionView.answerLabel.isHidden = true
     questionView.hintLabel.isHidden = true
+    questionIndexItem.title = "\(questionIndex+1)/\(questionGroup.questions.count)"
   }
   
   // MARK: - Actions
@@ -80,6 +107,7 @@ public class QuestionViewController: UIViewController {
   private func showNextQuestion() {
     questionIndex += 1
     guard questionIndex < questionGroup.questions.count else {
+      delegate?.questionViewController(self, didComplete: questionGroup)
       return
     }
     showQuestion()
