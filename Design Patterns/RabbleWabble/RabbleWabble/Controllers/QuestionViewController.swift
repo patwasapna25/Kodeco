@@ -41,11 +41,6 @@ public class QuestionViewController: UIViewController {
   // MARK: - Instance Properties
   public weak var delegate: QuestionViewControllerDelegate?
 
-  public var questionGroup = QuestionGroup.basicPhrases() {
-    didSet {
-      navigationItem.title = questionGroup.title
-    }
-  }
   public var questionIndex = 0
   
   public var correctCount = 0
@@ -117,7 +112,7 @@ public class QuestionViewController: UIViewController {
   @IBAction func handleIncorrect(_ sender: Any) {
     let question = questionStrategy.currentQuestion()
     questionStrategy.markQuestionIncorrect(question)
-    questionView.correctCountLabel.text = String(questionStrategy.incorrectCount)
+    questionView.incorrectCountLabel.text = String(questionStrategy.incorrectCount)
     
 //    incorrectCount += 1
 //    questionView.incorrectCountLabel.text = "\(incorrectCount)"
@@ -125,9 +120,7 @@ public class QuestionViewController: UIViewController {
   }
   
   private func showNextQuestion() {
-    questionIndex += 1
-    guard questionIndex < questionGroup.questions.count else {
-//      delegate?.questionViewController(self, didComplete: questionGroup)
+    guard questionStrategy.advanceToNextQuestion() else {
       delegate?.questionViewController(self, didComplete: questionStrategy)
       return
     }
