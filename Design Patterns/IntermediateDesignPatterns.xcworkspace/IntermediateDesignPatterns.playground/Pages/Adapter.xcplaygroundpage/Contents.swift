@@ -17,3 +17,55 @@
  
  ## Code Example
  */
+import Foundation 
+
+public class GoogleAuthenticator {
+    public func login(email: String, password: String, compleition: @escaping (GoogleUser?, Error?) -> Void) {
+        //Make networking calls which returns a special "token"
+        let token = "special-token"
+        let user = GoogleUser(email: email, password: password, token: token)
+        compleition(user, nil)
+    }
+}
+
+public struct GoogleUser {
+    public var email: String
+    public var password: String
+    public var token: String
+}
+
+public protocol AuthenticationService {
+    func login(email: String, password: String, success: @escaping (User, Token) -> Void, failure: @escaping (Error?) -> Void)
+}
+
+public struct User {
+    public let email: String
+    public let password: String
+}
+
+public struct Token {
+    public let value: String
+}
+
+public class GoogleAuthenticatorAdapter: AuthenticationService {
+    let authenticator = GoogleAuthenticator()
+    
+    public func login(email: String, password: String, success: @escaping (User, Token) -> Void, failure: @escaping (Error?) -> Void) {
+        authenticator.login(email: email, password: password, compleition: { (googleUser, error) in
+            guard let googleUser else {
+                failure(error)
+                return
+            }
+            let user = User(email: email, password: password)
+            let token = Token(value: googleUser.token)
+            success(user, token)
+        })
+    }    
+}
+
+let authService: AuthenticationService = GoogleAuthenticatorAdapter()
+authService.login(email: "user@ex.com", password: "password", success: { (user, token) in
+    print("Auth succeeded: \(user.email) \(token.value)")
+}, failure: { error in 
+    print("Auth Failed with error: \(String(describing: error))")
+})
