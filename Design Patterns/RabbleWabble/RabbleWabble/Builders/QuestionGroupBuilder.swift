@@ -1,4 +1,4 @@
-/// Copyright (c) 2020 Razeware LLC
+/// Copyright (c) 2024 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -26,59 +26,47 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import Combine
+import Foundation
 
-public class QuestionGroup: Codable {
+public class QuestionBuilder {
+  public var answer = ""
+  public var hint = ""
+  public var prompt = ""
   
-  public class Score: Codable {
-    private enum CodingKeys: String, CodingKey {
-      case correctCount
-      case incorrectCount
-    }
-    public var correctCount = 0 {
-      didSet {
-        updateRunningPercentage()
-      }
-    }
-    public var incorrectCount = 0 {
-      didSet {
-        updateRunningPercentage()
-      }
-    }
-    
-    @Published public var runningPercentage: Double = 0 
-    
-    public init() { }
-    
-    public required init(from decoder: Decoder) throws {
-      let container = try decoder.container(keyedBy: CodingKeys.self)
-      self.correctCount = try container.decode(Int.self, forKey: .correctCount)
-      self.incorrectCount = try container.decode(Int.self, forKey: .incorrectCount)
-      updateRunningPercentage()
-    }
-    
-    private func updateRunningPercentage() {
-      let totalCount = correctCount + incorrectCount
-      guard totalCount > 0 else {
-        runningPercentage = 0
-        return
-      }
-      runningPercentage = Double(correctCount) / Double(totalCount)
-    }
-    
-    public func reset() {
-      correctCount = 0
-      incorrectCount = 0
-    }
+  public func build() throws -> Question {
+    guard answer.count > 0 else { throw Erorr.missingAnswer }
+    guard prompt.count > 0 else { throw Erorr.missingPrompt }
+    return Question(answer: answer, hint: hint, prompt: prompt)
   }
   
-  public let questions: [Question]
-  public let title: String
-  public private(set) var score: Score
+  public enum Erorr: String, Swift.Error {
+    case missingAnswer
+    case missingPrompt
+  }
+}
+
+public class QuestionGroupBuilder {
+  public var questions = [QuestionBuilder]()
+  public var title = ""
   
-  init(questions: [Question], title: String, score: Score = Score()) {
-    self.questions = questions
-    self.title = title
-    self.score = score
+  public func addNewQuestion() {
+    let question = QuestionBuilder()
+    questions.append(question)
+  }
+  
+  public func removeQuestion(at index: Int) {
+    questions.remove(at: index)
+  }
+  
+  public func build() throws -> QuestionGroup {
+    guard title.count > 0 else { throw Error.missingTitle }
+    guard questions.count > 0 else { throw Error.missingQuestions }
+    let questions = try self.questions.map({ try $0.build() })
+    return QuestionGroup(questions: questions, title: title)
+  }
+  
+  public enum Error: String, Swift.Error {
+    case missingTitle
+    case missingQuestions
   }
 }
