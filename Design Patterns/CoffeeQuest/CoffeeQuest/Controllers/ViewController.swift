@@ -37,7 +37,7 @@ public class ViewController: UIViewController {
   
   // MARK: - Properties
   public let annotationFactory: AnnotationFactory()
-  private var businesses: [Buisness] = []
+  private var filter = Filter.identity()
   private let client: BuisnessSearchClient = YLPClient(apiKey: YelpAPIKey)
   private let locationManager = CLLocationManager()
   
@@ -57,7 +57,14 @@ public class ViewController: UIViewController {
   
   // MARK: - Actions
   @IBAction func businessFilterToggleChanged(_ sender: UISwitch) {
-    
+    let businesses = filter.businesses
+    if sender.isOn {
+      filter = Filter.starRating(atLeast: 4.0)
+    } else {
+      filter = Filter.identity()
+    }
+    filter.businesses = businesses
+    addAnnotations()
   }
 }
 
@@ -84,7 +91,7 @@ extension ViewController: MKMapViewDelegate {
                   offset: 0,
                   success: { [weak self] (buisness) in
       guard let self = self else { return }
-      self.businesses = buisness
+      self.filter.businesses = buisness
       DispatchQueue.main.async {
         self.addAnnotations()
       }
@@ -94,7 +101,8 @@ extension ViewController: MKMapViewDelegate {
   }
   
   private func addAnnotations() {
-    for business in businesses {
+    mapView.removeAnnotation(mapView.annotations)
+    for business in self.filter {
       let viewModel = annotationFactory.createBusinessMapViewModel(for: business)
       mapView.addAnnotation(annotation)
     }
