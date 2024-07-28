@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B5A87FD2C56C5760089684A /* MulticastDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B5A87FC2C56C5760089684A /* MulticastDelegate.swift */; };
 		1BED14CE2C5680E900C6EFBE /* Copying.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BED14CD2C5680E900C6EFBE /* Copying.swift */; };
 		1BED14D22C56917400C6EFBE /* AcceptInputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BED14D12C56917400C6EFBE /* AcceptInputState.swift */; };
 		1BED14D42C56918100C6EFBE /* AnimateState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BED14D32C56918100C6EFBE /* AnimateState.swift */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1B5A87FC2C56C5760089684A /* MulticastDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MulticastDelegate.swift; sourceTree = "<group>"; };
 		1BED14CD2C5680E900C6EFBE /* Copying.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Copying.swift; sourceTree = "<group>"; };
 		1BED14D12C56917400C6EFBE /* AcceptInputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcceptInputState.swift; sourceTree = "<group>"; };
 		1BED14D32C56918100C6EFBE /* AnimateState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimateState.swift; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 		4245EC792074415400E347D0 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				1B5A87FC2C56C5760089684A /* MulticastDelegate.swift */,
 				1BED14CD2C5680E900C6EFBE /* Copying.swift */,
 			);
 			path = Protocols;
@@ -235,6 +238,7 @@
 				1BED14D62C56918B00C6EFBE /* ClearState.swift in Sources */,
 				1BED14CE2C5680E900C6EFBE /* Copying.swift in Sources */,
 				42F35C3620449C9A00584FAD /* AppDelegate.swift in Sources */,
+				1B5A87FD2C56C5760089684A /* MulticastDelegate.swift in Sources */,
 				1BED14D22C56917400C6EFBE /* AcceptInputState.swift in Sources */,
 				424387E420449D300056B653 /* DrawView.swift in Sources */,
 			);

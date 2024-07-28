@@ -13,3 +13,50 @@
  
  ## Code Example
  */
+public protocol EmergencyResponding {
+    func notifyFire(at location: String)
+    func notifyCarCrash(at location: String)
+}
+
+public class FireStation: EmergencyResponding {
+    public func notifyCarCrash(at location: String) {
+        print("Fire fighters were notified about fire at " + location)
+    }
+    
+    public func notifyFire(at location: String) {
+        print("Fire fighters were notified about car crash at " + location)
+    }
+}
+
+public class PoliceStation: EmergencyResponding {
+    public func notifyCarCrash(at location: String) {
+        print("Police were notified about car crash at " + location)
+    }
+    
+    public func notifyFire(at location: String) {
+        print("Police were notified about car crash at " + location)
+    }
+}
+
+// Delegation object
+public class DispatchSystem {
+    let multicastDelegate = MulticastDelegate<EmergencyResponding>()
+}
+
+//Example
+let dispatch = DispatchSystem()
+var policeStation: PoliceStation! = PoliceStation()
+var fireStation: FireStation! = FireStation()
+dispatch.multicastDelegate.addDelegate(policeStation)
+dispatch.multicastDelegate.addDelegate(fireStation)
+
+dispatch.multicastDelegate.invokeDelegates( {
+    $0.notifyFire(at: "Ray's house")
+})
+
+print("")
+fireStation = nil
+dispatch.multicastDelegate.invokeDelegates( {
+    $0.notifyCarCrash(at: "Ray's garage")
+})
+
